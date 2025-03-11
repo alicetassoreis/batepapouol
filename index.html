@@ -4,35 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bate Papo UOL</title>
-    <link rel="stylesheet" href="reset.css" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
     <div class="chat-container">
         <header>
             <img src="imagens/logo.png" alt="Logo">
             <button id="participants-btn"><img src="imagens/ícone.png" alt="Ícone de participantes"></button>
         </header>
+
         <ul id="messages" class="messages"></ul>
+
         <footer>
-            <input type="text" id="message-input" placeholder="Escreva aqui...">
-            <button id="send-btn"><ion-icon name="paper-plane-outline"></ion-icon></button>
+            <p id="selected-destination">Enviando para: <span>Todos</span></p>
+            <p id="selected-visibility">Visibilidade: <span>Público</span></p>
+            <div class="inputcontainer">
+                <input type="text" id="message-input" placeholder="Escreva aqui...">
+                <button id="send-btn"><ion-icon name="paper-plane-outline"></ion-icon></button>
+            </div>
         </footer>
     </div>
 
-    <div id="participants" class="hidden">
-        <h2>Escolha um contato para enviar mensagem:</h2>
-        <li id="todos">
-            <ion-icon name="people"></ion-icon>
-            <span>Todos</span>
-        </li>
-        <ul id="participants-list"></ul>
+    <div class="sidebar">
+        <div id="participants">
+            <h2>Escolha um contato para enviar mensagem:</h2>
+            <ul id="participants-list">
+                <li data-user="Todos" class="selected-participant">
+                    <ion-icon name="people"></ion-icon>
+                    <p id="selected-participant">Todos</p>
+                </li>
+            </ul>
 
-        <div class="options">
             <h3>Escolha a visibilidade:</h3>
-            <ul>
-                <li id="public-option">
+            <ul id="visibility-options">
+                <li id="public-option" class="selected">
                     <ion-icon name="lock-open-sharp"></ion-icon>
                     <span>Público</span>
                 </li>
@@ -44,6 +50,8 @@
         </div>
     </div>
 
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.2/ionicons.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="script.js"></script>

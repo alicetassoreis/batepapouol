@@ -20,7 +20,8 @@ body {
     display: flex;
     flex-direction: column;
     background-color: white;
-    border: 1px solid;
+    border: 1px solid #ccc;
+    position: relative;
 }
 
 header {
@@ -65,16 +66,25 @@ h3 {
     margin-bottom: 20px;
 }
 
-button {
-    background-color: #ffffff;
-    border: 0;
-}
-
 footer {
     display: flex;
+    flex-direction: column;
     padding: 1rem;
     background-color: #fff;
     border-top: 1px solid #ccc;
+    gap: 0.5rem;
+}
+
+footer p {
+    font-size: 0.9em;
+    color: gray;
+    margin-bottom: 5px;
+}
+
+.inputcontainer {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 footer input {
@@ -82,40 +92,69 @@ footer input {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 8px;
+    width: 100%;
 }
 
 footer button {
     padding: 0.5rem 1rem;
-    margin-left: 0.5rem;
     background-color: #ffffff;
     border: none;
-    border-radius: 8px;
     cursor: pointer;
-}
-
-button {
-    cursor: pointer;
+    white-space: nowrap;
 }
 
 .time {
     color: #808080;
 }
 
-#participants {
+.sidebar {
     position: fixed;
     top: 0;
-    right: -300px;
-    width: 300px;
+    right: -3000px; /* Começa oculta */
+    width: 50%;
     height: 100%;
-    background-color: #fff;
+    background-color: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-    transition: right 0.3s ease;
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
 }
 
-#participants h2 {
-    padding: 1rem;
-    background-color: #ffffff;
+.sidebar.visible {
+    right: 0; /* Abre a sidebar ao clicar */
 }
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+.overlay.show {
+    display: block;
+}
+
+#participants {
+    display: none; /* Inicialmente escondida */
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%); /* Escondida fora da tela */
+}
+
+#participants.visible {
+    display: block;
+    transform: translateX(0); /* Mostra a sidebar */
+}
+
 
 #participants ul {
     list-style: none;
@@ -123,7 +162,59 @@ button {
 }
 
 #participants li {
-    padding: 0.5rem 0;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+}
+
+#participants-list li.selected {
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between; /* Distribui o texto e o ícone */
+    align-items: center;
+    padding-right: 10px; /* Dá um espaçamento do lado direito */
+}
+
+#participants-list li.selected::after {
+    content: "";
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.selected-visibility {
+    display: flex;
+    justify-content: space-between; /* Faz o texto ficar à esquerda e o ícone à direita */
+    background: none; /* Remove o ícone do fundo */
+    padding: 10px;
+    cursor: pointer;
+    font-weight: bold; /* Deixa o texto "Reservadamente" em negrito */
+}
+
+.selected-visibility::after {
+    content: "";
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+#visibility-options {
+    list-style: none;
+    padding: 0;
+    justify-content: space-between; /* Distribui o texto e o ícone */
+    align-items: center;
+    font-weight: normal;
+}
+
+#visibility-options li {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .hidden {
@@ -134,20 +225,20 @@ button {
     right: 0 !important;
 }
 
-#participants .options {
-    padding: 1rem;
-}
+#participants-btn {
+    background-color: #ffffff; 
+    border: none; 
+    padding: 10px;
+    cursor: pointer; 
+  }
+  
+  #participants-btn img {
+    width: 35px; 
+    height: 35px; 
+  }
 
-#participants .options ul {
-    list-style: none;
-    padding: 0;
+@media (max-width: 600px) {
+    .sidebar {
+        width: 50%;
+    }
 }
-
-#participants .options li {
-    margin-bottom: 1rem;
-}
-
-#participants .options input {
-    margin-right: 0.5rem;
-}
-
