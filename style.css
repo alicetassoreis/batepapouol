@@ -2,7 +2,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
 }
 
 body {
@@ -11,6 +10,7 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #f5f5f5;
+    font-family: 'Roboto', sans-serif;
 }
 
 .chat-container {
@@ -54,7 +54,7 @@ header {
 }
 
 .private_message {
-    background-color: #ffcccc;
+    background-color: #ffdede;
 }
 
 h2 {
@@ -148,6 +148,7 @@ footer button {
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease-in-out;
     transform: translateX(100%); /* Escondida fora da tela */
+    padding: 1%;
 }
 
 #participants.visible {
@@ -167,6 +168,7 @@ footer button {
     display: flex;
     align-items: center;
     gap: 8px;
+    
 
 }
 
@@ -236,6 +238,20 @@ footer button {
     width: 35px; 
     height: 35px; 
   }
+
+#messages li strong {
+    font-weight: bold; 
+}
+
+#messages {
+    max-height: 400px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 10px;
+}
+
+
+
 
 @media (max-width: 600px) {
     .sidebar {

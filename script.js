@@ -1,13 +1,12 @@
-// Variáveis globais
-let uuid = localStorage.getItem("chat_uuid") || crypto.randomUUID();
-localStorage.setItem("chat_uuid", uuid);
+// Gerar ou recuperar UUID
+let uuid = "cc55549e-4459-4296-894a-6e53317f015c";
 let username = "";
 let selectedUser = "Todos";
 let visibility = 'public';
 let users = [];
 const participantsList = document.getElementById('participants-list');
 
-// Pedir o nome do usuário
+// Pedir o nome do usuário e entrar na sala
 async function askUsername() {
     while (true) {
         username = prompt("Qual é o seu nome?");
@@ -19,15 +18,23 @@ async function askUsername() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: username })
             });
+
             if (response.ok) {
+                document.body.dataset.username = username;
                 enterRoom();
                 break;
+            } else if (response.status === 400) {
+                alert("Nome já em uso, tente outro!");
+            } else {
+                throw new Error('Erro ao entrar na sala');
             }
         } catch (err) {
-            alert("Nome já em uso, tente outro!");
+            console.error("Erro ao entrar na sala:", err);
         }
     }
 }
+
+
 
 // Entrar na sala de chat
 async function enterRoom() {
@@ -38,7 +45,7 @@ async function enterRoom() {
 
 // Manter a conexão ativa
 async function keepConnection() {
-    await fetch(`https://mock-api.driven.com.br/api/v6/uol/status/${uuid}`, {
+    await fetch(`https://mock-api.driven.com.br/api/v6/uol/participants/${uuid}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: username })
@@ -51,13 +58,15 @@ async function fetchMessages() {
         const response = await fetch(`https://mock-api.driven.com.br/api/v6/uol/messages/${uuid}`);
         const messages = await response.json();
         
-        renderMessages(messages); // Agora as mensagens serão exibidas corretamente
+        renderMessages(messages); // Exibe as mensagens para todos os usuários
 
-        setTimeout(fetchMessages, 3000);
+        // Recarregar as mensagens em intervalos de 3 segundos
+        setTimeout(fetchMessages, 3000); // Ajuste o intervalo conforme necessário
     } catch (error) {
         console.error("Erro ao buscar mensagens:", error);
     }
 }
+
 
 
 // Renderizar mensagens no chat
@@ -80,7 +89,9 @@ function renderMessages(messages) {
         li.classList.add(msg.type);
         li.dataset.id = msg.time + msg.from + msg.text; // ID único para evitar duplicação
 
-        const to = msg.to === "Todos" ? "<strong>Todos</strong>" : `<strong>${msg.to}</strong>`;
+                // Aplica negrito apenas para "Todos" e para os nomes dos participantes
+                const to = msg.to === "Todos" ? "<strong>Todos</strong>" : msg.to;  // "Todos" será em negrito
+                const from = msg.from === username || msg.to === username ? `<strong>${msg.from}</strong>` : msg.from; // Seu nome ou destinatário será em negrito
 
         li.innerHTML = `<span class='time'>(${msg.time})</span> <strong>${msg.from}</strong> para ${to}: ${msg.text}`;
 
@@ -103,20 +114,37 @@ async function getParticipants() {
 function renderParticipants(participants) {
     participantsList.innerHTML = "";
 
-    // Criar a opção "Todos"
+    // Criar a opção "Todos" com o ícone
     const allOption = document.createElement('li');
     allOption.classList.add("participant");
     allOption.dataset.name = "Todos";
-    allOption.textContent = "Todos";
+    
+    // Ícone ao lado de "Todos"
+    const icon = document.createElement('ion-icon');
+    icon.setAttribute('name', 'people');  // ícone para "Todos"
+    allOption.appendChild(icon);
+    
+    // Texto de "Todos"
+    const text = document.createElement('p');
+    text.textContent = "Todos";
+    allOption.appendChild(text);
+
     allOption.addEventListener("click", () => selectParticipant("Todos"));
     participantsList.appendChild(allOption);
 
-    // Adicionar os participantes dinâmicos
+    // Adicionar os participantes dinâmicos com ícones
     participants.forEach(participant => {
         const li = document.createElement("li");
         li.classList.add("participant");
         li.dataset.name = participant.name;
-        li.textContent = participant.name;
+
+        const icon = document.createElement('ion-icon');
+        icon.setAttribute('name', 'person');  // ícone para participante
+        li.appendChild(icon);
+        
+        const participantName = document.createElement('p');
+        participantName.textContent = participant.name;
+        li.appendChild(participantName);
 
         li.addEventListener("click", () => selectParticipant(participant.name));
         participantsList.appendChild(li);
@@ -125,6 +153,7 @@ function renderParticipants(participants) {
     // Atualizar visualmente a seleção (garantindo que "Todos" começa selecionado)
     updateSelection();
 }
+
 
 // Selecionar participante
 function selectParticipant(name) {
@@ -149,6 +178,7 @@ function updateSelection() {
         }
     });
 }
+
 
 // Configurar visibilidade
 const publicOption = document.querySelector('#public-option');
@@ -200,28 +230,24 @@ document.getElementById('send-btn').addEventListener('click', async () => {
         };
 
         try {
-            // Adicionar a mensagem na tela imediatamente
-            addMessageToChat(messageData, true);
-
-            await fetch("https://mock-api.driven.com.br/api/v6/uol/messages", {
+            // Enviar a mensagem para o servidor
+            await fetch(`https://mock-api.driven.com.br/api/v6/uol/messages/${uuid}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(messageData)
             });
 
-            // Limpar input
+            // Limpar input após envio
             messageInput.value = "";
 
-            // Buscar novas mensagens apenas se for pública
-            if (visibility === "public") {
-                setTimeout(fetchMessages, 1000);
-            }
-
+            // Somente buscar mensagens após enviar a mensagem
+            fetchMessages(); 
         } catch (err) {
             console.error("Erro ao enviar mensagem:", err);
         }
     }
 });
+
 
 // Adicionar mensagem na interface
 function addMessageToChat(messageData, isLocal = false) {
@@ -263,3 +289,5 @@ participantsDiv.addEventListener('click', (event) => {
 
 
 askUsername();
+
+//Obs: Gosto de deixar os comentários enquanto ainda estou aprendendo para revisar vez ou outra
